@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Big Result Promise</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1 class="title">Big Result Promise</h1>
+            <p class="subtitle">Transform your goals into compelling product promises</p>
+        </header>
+
+        <main class="main-content">
+            <div class="input-section">
+                <div class="input-group">
+                    <label for="desiredResult" class="input-label">Desired Result</label>
+                    <input 
+                        type="text" 
+                        id="desiredResult" 
+                        class="input-field"
+                        placeholder="e.g., Double your revenue, Master a new skill"
+                    >
+                </div>
+                
+                <div class="input-group">
+                    <label for="timeFrame" class="input-label">Time Frame To Get Result</label>
+                    <input 
+                        type="text" 
+                        id="timeFrame" 
+                        class="input-field"
+                        placeholder="e.g., 30 days, 12 weeks, 6 months"
+                    >
+                </div>
+
+                <button id="generateBtn" class="generate-btn">
+                    <span class="btn-text">Get The Big Result</span>
+                    <div class="spinner hidden"></div>
+                </button>
+            </div>
+
+            <div id="resultsContainer" class="results-container hidden">
+                <div class="result-card">
+                    <h3 class="result-title">🎯 Headline Version</h3>
+                    <p id="headline" class="result-text"></p>
+                </div>
+                
+                <div class="result-card">
+                    <h3 class="result-title">📄 Sales Page Promise</h3>
+                    <p id="salesPromise" class="result-text"></p>
+                </div>
+                
+                <div class="result-card">
+                    <h3 class="result-title">📢 Ad Copy Foundation</h3>
+                    <p id="adCopy" class="result-text"></p>
+                </div>
+            </div>
+
+            <div id="errorContainer" class="error-container hidden">
+                <p id="errorMessage" class="error-message"></p>
+            </div>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
