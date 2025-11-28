@@ -3,70 +3,248 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Big Result Promise</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css">
+    <title>Big Result Promise Generator</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Load Poppins from Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Define CSS Variables for Theming */
+        :root {
+            --primary-color: #4f46e5; /* Indigo 600 */
+            --primary-dark: #4338ca; /* Indigo 700 */
+            --bg-color: #f8fafc; /* Slate 50 */
+            --card-bg: #ffffff;
+            --text-color: #1e293b; /* Slate 800 */
+            --shadow-color: rgba(79, 70, 229, 0.1);
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background-color 0.3s ease;
+        }
+
+        /* Custom Card Styling */
+        .result-card {
+            background-color: var(--card-bg);
+            border-radius: 1rem;
+            box-shadow: 0 10px 15px -3px var(--shadow-color), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        /* Button hover transition and shadow */
+        .submit-button {
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+        }
+
+        .submit-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+            background-color: var(--primary-dark);
+        }
+        
+        /* Pulse Animation for Loading */
+        .animate-pulse-fast {
+            animation: pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        /* Fade-in for results */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+    </style>
 </head>
-<body>
-    <div class="container">
-        <header class="header">
-            <h1 class="title">Big Result Promise</h1>
-            <p class="subtitle">Transform your goals into compelling product promises</p>
+<body class="min-h-screen flex items-start sm:items-center justify-center p-4">
+
+    <!-- Main Container -->
+    <div class="w-full max-w-4xl bg-white p-6 sm:p-10 rounded-xl shadow-2xl transition-all duration-300">
+        <header class="text-center mb-8">
+            <h1 class="text-4xl font-extrabold text-gray-900 mb-2">The Big Result Promise Generator</h1>
+            <p class="text-gray-500 text-lg">Define your result. Get your compelling product promise.</p>
         </header>
 
-        <main class="main-content">
-            <div class="input-section">
-                <div class="input-group">
-                    <label for="desiredResult" class="input-label">Desired Result</label>
-                    <input 
-                        type="text" 
-                        id="desiredResult" 
-                        class="input-field"
-                        placeholder="e.g., Double your revenue, Master a new skill"
-                    >
-                </div>
-                
-                <div class="input-group">
-                    <label for="timeFrame" class="input-label">Time Frame To Get Result</label>
-                    <input 
-                        type="text" 
-                        id="timeFrame" 
-                        class="input-field"
-                        placeholder="e.g., 30 days, 12 weeks, 6 months"
-                    >
-                </div>
-
-                <button id="generateBtn" class="generate-btn">
-                    <span class="btn-text">Get The Big Result</span>
-                    <div class="spinner hidden"></div>
-                </button>
+        <!-- Input Form -->
+        <form id="promiseForm" class="space-y-6">
+            <div>
+                <label for="desiredResult" class="block text-sm font-semibold text-gray-700 mb-1">
+                    🎯 Desired Result (What will the user achieve?)
+                </label>
+                <textarea id="desiredResult" name="desiredResult" rows="3" required
+                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-150"
+                    placeholder="E.g., Lose 10 pounds of stubborn belly fat, or, Launch a profitable side business generating $5k/month."></textarea>
             </div>
 
-            <div id="resultsContainer" class="results-container hidden">
-                <div class="result-card">
-                    <h3 class="result-title">🎯 Headline Version</h3>
-                    <p id="headline" class="result-text"></p>
-                </div>
-                
-                <div class="result-card">
-                    <h3 class="result-title">📄 Sales Page Promise</h3>
-                    <p id="salesPromise" class="result-text"></p>
-                </div>
-                
-                <div class="result-card">
-                    <h3 class="result-title">📢 Ad Copy Foundation</h3>
-                    <p id="adCopy" class="result-text"></p>
-                </div>
+            <div>
+                <label for="timeFrame" class="block text-sm font-semibold text-gray-700 mb-1">
+                    ⏱️ Time Frame To Get Result
+                </label>
+                <input type="text" id="timeFrame" name="timeFrame" required
+                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-150"
+                    placeholder="E.g., in the next 30 days, or, within 6 weeks, or, by the end of the quarter.">
             </div>
 
-            <div id="errorContainer" class="error-container hidden">
-                <p id="errorMessage" class="error-message"></p>
+            <button type="submit" id="submitButton"
+                class="submit-button w-full py-3 text-lg font-bold text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-4 focus:ring-indigo-500 focus:ring-opacity-50">
+                Get The Big Result Promise
+            </button>
+        </form>
+
+        <!-- Message/Error Box -->
+        <div id="messageBox" class="mt-6 p-4 rounded-lg hidden" role="alert"></div>
+
+        <!-- Result Container -->
+        <div id="resultsContainer" class="mt-10 space-y-6 hidden">
+            <h2 class="text-2xl font-bold text-gray-800 border-b pb-2">Your Product Promises:</h2>
+            
+            <!-- Headline Version Card -->
+            <div id="headlineCard" class="result-card p-6 border-l-4 border-indigo-500">
+                <p class="text-sm font-semibold text-indigo-600 mb-2">1. Headline Version</p>
+                <p id="headlineText" class="text-xl font-extrabold text-gray-900"></p>
             </div>
-        </main>
+
+            <!-- Sales Page Promise Card -->
+            <div id="salesPageCard" class="result-card p-6 border-l-4 border-emerald-500">
+                <p class="text-sm font-semibold text-emerald-600 mb-2">2. Sales Page Promise</p>
+                <p id="salesPageText" class="text-lg text-gray-700"></p>
+            </div>
+            
+            <!-- Ad Copy Foundation Card -->
+            <div id="adCopyCard" class="result-card p-6 border-l-4 border-rose-500">
+                <p class="text-sm font-semibold text-rose-600 mb-2">3. Ad Copy Foundation</p>
+                <p id="adCopyText" class="text-lg font-bold text-gray-800"></p>
+            </div>
+        </div>
     </div>
 
-    <script src="script.js"></script>
+    <script>
+        // !! IMPORTANT: REPLACE THIS PLACEHOLDER WITH YOUR DEPLOYED GOOGLE APPS SCRIPT WEB APP URL !!
+        const GAS_API_URL = "https://script.google.com/macros/s/AKfycbyFw2S26iqkyaoUrbrjJF1a3jnayniZZYTAvkdKu4_EwGpATNUGmokMwjHl0Wa312Y/exec"; 
+        
+        const form = document.getElementById('promiseForm');
+        const submitButton = document.getElementById('submitButton');
+        const resultsContainer = document.getElementById('resultsContainer');
+        const messageBox = document.getElementById('messageBox');
+        
+        // References for the result texts
+        const headlineText = document.getElementById('headlineText');
+        const salesPageText = document.getElementById('salesPageText');
+        const adCopyText = document.getElementById('adCopyText');
+
+        // Utility to display messages (instead of alert())
+        function showMessage(message, type = 'error') {
+            messageBox.textContent = message;
+            messageBox.classList.remove('hidden', 'bg-red-100', 'text-red-800', 'bg-green-100', 'text-green-800');
+            if (type === 'error') {
+                messageBox.classList.add('bg-red-100', 'text-red-800');
+            } else if (type === 'success') {
+                messageBox.classList.add('bg-green-100', 'text-green-800');
+            }
+        }
+
+        function clearMessage() {
+            messageBox.classList.add('hidden');
+            messageBox.textContent = '';
+        }
+
+        function setLoading(isLoading) {
+            submitButton.disabled = isLoading;
+            if (isLoading) {
+                submitButton.innerHTML = `
+                    <svg class="animate-spin-fast h-5 w-5 mr-3 inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Generating Promise...
+                `;
+                submitButton.classList.add('animate-pulse-fast');
+            } else {
+                submitButton.innerHTML = 'Get The Big Result Promise';
+                submitButton.classList.remove('animate-pulse-fast');
+            }
+        }
+
+        // Function to parse the AI's numbered output into separate parts
+        function parsePromises(text) {
+            // Use regex to split the string based on the numbered list format "1. ", "2. ", "3. "
+            // The split array will contain: 
+            // [0] = "" (before "1.")
+            // [1] = "Headline Version..."
+            // [2] = "Sales Page Promise..."
+            // [3] = "Ad Copy Foundation..."
+            const parts = text.split(/\d\.\s/g).map(p => p.trim()).filter(p => p.length > 0);
+            
+            if (parts.length === 3) {
+                return {
+                    headline: parts[0],
+                    salesPage: parts[1],
+                    adCopy: parts[2]
+                };
+            }
+            // If parsing fails, return the raw text for debugging/display
+            return {
+                headline: 'Error: Could not parse output. Raw output:',
+                salesPage: text,
+                adCopy: 'Check the GAS console logs for errors.'
+            };
+        }
+
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            clearMessage();
+
+            if (GAS_API_URL.includes("YOUR_GAS_WEB_APP_URL_HERE")) {
+                showMessage("🛑 Configuration Error: Please replace 'YOUR_GAS_WEB_APP_URL_HERE' in the JavaScript code with your actual deployed Google Apps Script URL.", 'error');
+                return;
+            }
+
+            setLoading(true);
+            resultsContainer.classList.add('hidden');
+
+            // Use FormData for simple, CORS-friendly submission to GAS
+            const formData = new FormData(form);
+            
+            try {
+                // Fetch call to the GAS Web App URL
+                const response = await fetch(GAS_API_URL, {
+                    method: 'POST',
+                    body: formData // Sends data as application/x-www-form-urlencoded
+                });
+                
+                if (!response.ok) {
+                    // Though GAS typically returns 200, checking the network status is good practice
+                    throw new Error(`Network response was not ok, status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    const promises = parsePromises(data.promise);
+
+                    headlineText.textContent = promises.headline;
+                    salesPageText.textContent = promises.salesPage;
+                    adCopyText.textContent = promises.adCopy;
+                    
+                    resultsContainer.classList.remove('hidden');
+                    showMessage("Promise generated successfully!", 'success');
+
+                } else {
+                    // Handle application-level errors from the GAS script
+                    throw new Error(data.error || "An unknown error occurred in the backend.");
+                }
+
+            } catch (error) {
+                console.error("Fetch Error:", error);
+                showMessage(`Generation Failed: ${error.message || 'Check browser console and Google Apps Script logs.'}`, 'error');
+            } finally {
+                setLoading(false);
+            }
+        });
+    </script>
 </body>
 </html>
