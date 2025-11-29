@@ -3,248 +3,393 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Big Result Promise Generator</title>
-    <!-- Load Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Load Poppins from Google Fonts -->
+    <title>🎯 Big Result Promise Generator</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
-        /* Define CSS Variables for Theming */
+        /* CSS Variables */
         :root {
-            --primary-color: #4f46e5; /* Indigo 600 */
-            --primary-dark: #4338ca; /* Indigo 700 */
-            --bg-color: #f8fafc; /* Slate 50 */
-            --card-bg: #ffffff;
-            --text-color: #1e293b; /* Slate 800 */
-            --shadow-color: rgba(79, 70, 229, 0.1);
+            --primary-color: #007bff; /* Blue */
+            --secondary-color: #6c757d; /* Gray */
+            --success-color: #28a745; /* Green */
+            --bg-color: #f8f9fa; /* Light Gray */
+            --card-bg-color: #ffffff;
+            --text-color: #343a40; /* Dark Gray */
+            --error-color: #dc3545; /* Red */
+            --shadow-light: 0 4px 15px rgba(0, 0, 0, 0.1);
+            --shadow-hover: 0 8px 25px rgba(0, 0, 0, 0.2);
+            --border-radius: 12px;
+            --transition-speed: 0.3s;
         }
 
+        /* Base Styles */
         body {
             font-family: 'Poppins', sans-serif;
             background-color: var(--bg-color);
             color: var(--text-color);
-            transition: background-color 0.3s ease;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* Align to top initially for better scrolling */
+            min-height: 100vh;
+            padding: 20px;
+            box-sizing: border-box;
         }
 
-        /* Custom Card Styling */
-        .result-card {
-            background-color: var(--card-bg);
-            border-radius: 1rem;
-            box-shadow: 0 10px 15px -3px var(--shadow-color), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            animation: fadeIn 0.8s ease-out;
+        .container {
+            width: 100%;
+            max-width: 800px;
         }
 
-        /* Button hover transition and shadow */
-        .submit-button {
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+        /* Header */
+        header {
+            text-align: center;
+            margin-bottom: 40px;
         }
 
-        .submit-button:hover {
+        header h1 {
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        header p {
+            color: var(--secondary-color);
+        }
+
+        /* Input Card/Form */
+        #input-card {
+            background-color: var(--card-bg-color);
+            padding: 30px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-light);
+            margin-bottom: 40px;
+            transition: box-shadow var(--transition-speed) ease-in-out;
+        }
+
+        #input-card:hover {
+            box-shadow: var(--shadow-hover);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 16px;
+            transition: border-color var(--transition-speed), box-shadow var(--transition-speed);
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+        }
+
+        /* Button */
+        #submit-button {
+            width: 100%;
+            padding: 15px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color var(--transition-speed), transform 0.1s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #submit-button:hover:not(:disabled) {
+            background-color: #0056b3;
             transform: translateY(-2px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
-            background-color: var(--primary-dark);
         }
         
-        /* Pulse Animation for Loading */
-        .animate-pulse-fast {
-            animation: pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        #submit-button:active:not(:disabled) {
+            transform: translateY(0);
         }
 
-        /* Fade-in for results */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+        #submit-button:disabled {
+            background-color: var(--secondary-color);
+            cursor: not-allowed;
+            opacity: 0.7;
         }
 
+        /* Loader Animation */
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+            display: none; /* Hidden by default */
+        }
+
+        .loading .spinner {
+            display: block;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Result Area */
+        #result-area {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+            padding-top: 20px;
+        }
+        
+        #result-area.fade-in {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .result-card {
+            background-color: var(--card-bg-color);
+            padding: 25px;
+            margin-bottom: 20px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-light);
+            border-left: 5px solid var(--primary-color);
+        }
+
+        .result-card h3 {
+            margin-top: 0;
+            color: var(--primary-color);
+            font-weight: 600;
+            font-size: 1.2em;
+        }
+
+        .result-card p {
+            margin: 0;
+            white-space: pre-wrap; /* Preserves line breaks from the backend */
+        }
+
+        /* Notifications */
+        #message-box {
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: -20px; /* Space between card and message */
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 600;
+            display: none; /* Hidden by default */
+        }
+
+        .error {
+            background-color: #f8d7da;
+            color: var(--error-color);
+            border: 1px solid var(--error-color);
+        }
+
+        .success {
+            background-color: #d4edda;
+            color: var(--success-color);
+            border: 1px solid var(--success-color);
+        }
+
+
+        /* Mobile Responsiveness */
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+
+            .container {
+                padding: 0;
+            }
+
+            header h1 {
+                font-size: 1.8em;
+            }
+
+            #input-card {
+                padding: 20px;
+            }
+
+            #submit-button {
+                font-size: 16px;
+                padding: 12px;
+            }
+
+            .result-card {
+                padding: 20px;
+            }
+        }
     </style>
 </head>
-<body class="min-h-screen flex items-start sm:items-center justify-center p-4">
+<body>
 
-    <!-- Main Container -->
-    <div class="w-full max-w-4xl bg-white p-6 sm:p-10 rounded-xl shadow-2xl transition-all duration-300">
-        <header class="text-center mb-8">
-            <h1 class="text-4xl font-extrabold text-gray-900 mb-2">The Big Result Promise Generator</h1>
-            <p class="text-gray-500 text-lg">Define your result. Get your compelling product promise.</p>
-        </header>
+<div class="container">
+    <header>
+        <h1>🎯 Big Result Promise Generator</h1>
+        <p>Craft a powerful, benefits-driven Product Promise using AI.</p>
+    </header>
 
-        <!-- Input Form -->
-        <form id="promiseForm" class="space-y-6">
-            <div>
-                <label for="desiredResult" class="block text-sm font-semibold text-gray-700 mb-1">
-                    🎯 Desired Result (What will the user achieve?)
-                </label>
-                <textarea id="desiredResult" name="desiredResult" rows="3" required
-                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-150"
-                    placeholder="E.g., Lose 10 pounds of stubborn belly fat, or, Launch a profitable side business generating $5k/month."></textarea>
+    <div id="message-box"></div>
+    
+    <div id="input-card">
+        <form id="promise-form">
+            <div class="form-group">
+                <label for="desiredResult">Desired Result (e.g., Get 1000 new customers)</label>
+                <input type="text" id="desiredResult" name="desiredResult" placeholder="Insert your Desired Result..." required>
             </div>
-
-            <div>
-                <label for="timeFrame" class="block text-sm font-semibold text-gray-700 mb-1">
-                    ⏱️ Time Frame To Get Result
-                </label>
-                <input type="text" id="timeFrame" name="timeFrame" required
-                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-150"
-                    placeholder="E.g., in the next 30 days, or, within 6 weeks, or, by the end of the quarter.">
+            <div class="form-group">
+                <label for="timeFrame">Time Frame To Get Result (e.g., in 90 days, within a week)</label>
+                <input type="text" id="timeFrame" name="timeFrame" placeholder="Insert your Time Frame..." required>
             </div>
-
-            <button type="submit" id="submitButton"
-                class="submit-button w-full py-3 text-lg font-bold text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-4 focus:ring-indigo-500 focus:ring-opacity-50">
-                Get The Big Result Promise
+            <button type="submit" id="submit-button">
+                <span class="spinner"></span>
+                <span id="button-text">Get The Big Result</span>
             </button>
         </form>
-
-        <!-- Message/Error Box -->
-        <div id="messageBox" class="mt-6 p-4 rounded-lg hidden" role="alert"></div>
-
-        <!-- Result Container -->
-        <div id="resultsContainer" class="mt-10 space-y-6 hidden">
-            <h2 class="text-2xl font-bold text-gray-800 border-b pb-2">Your Product Promises:</h2>
-            
-            <!-- Headline Version Card -->
-            <div id="headlineCard" class="result-card p-6 border-l-4 border-indigo-500">
-                <p class="text-sm font-semibold text-indigo-600 mb-2">1. Headline Version</p>
-                <p id="headlineText" class="text-xl font-extrabold text-gray-900"></p>
-            </div>
-
-            <!-- Sales Page Promise Card -->
-            <div id="salesPageCard" class="result-card p-6 border-l-4 border-emerald-500">
-                <p class="text-sm font-semibold text-emerald-600 mb-2">2. Sales Page Promise</p>
-                <p id="salesPageText" class="text-lg text-gray-700"></p>
-            </div>
-            
-            <!-- Ad Copy Foundation Card -->
-            <div id="adCopyCard" class="result-card p-6 border-l-4 border-rose-500">
-                <p class="text-sm font-semibold text-rose-600 mb-2">3. Ad Copy Foundation</p>
-                <p id="adCopyText" class="text-lg font-bold text-gray-800"></p>
-            </div>
-        </div>
     </div>
 
-    <script>
-        // !! IMPORTANT: REPLACE THIS PLACEHOLDER WITH YOUR DEPLOYED GOOGLE APPS SCRIPT WEB APP URL !!
-        const GAS_API_URL = "https://script.google.com/macros/s/AKfycbz_waD54o4QuyMqnCv6sGYFwHR-rIVZSQ5lwYqeg0OdKjqpzZ22vQkkYjHt3_RNul0W/exec"; 
-        
-        const form = document.getElementById('promiseForm');
-        const submitButton = document.getElementById('submitButton');
-        const resultsContainer = document.getElementById('resultsContainer');
-        const messageBox = document.getElementById('messageBox');
-        
-        // References for the result texts
-        const headlineText = document.getElementById('headlineText');
-        const salesPageText = document.getElementById('salesPageText');
-        const adCopyText = document.getElementById('adCopyText');
+    <div id="result-area">
+        <h2>Your Product Promise:</h2>
+        <div id="headline-version" class="result-card">
+            <h3>1. Headline Version (Short & Bold)</h3>
+            <p></p>
+        </div>
+        <div id="sales-page-promise" class="result-card">
+            <h3>2. Sales Page Promise (1–2 persuasive sentences)</h3>
+            <p></p>
+        </div>
+        <div id="ad-copy-foundation" class="result-card">
+            <h3>3. Ad Copy Foundation (High-impact one-liner)</h3>
+            <p></p>
+        </div>
+    </div>
+</div>
 
-        // Utility to display messages (instead of alert())
-        function showMessage(message, type = 'error') {
-            messageBox.textContent = message;
-            messageBox.classList.remove('hidden', 'bg-red-100', 'text-red-800', 'bg-green-100', 'text-green-800');
-            if (type === 'error') {
-                messageBox.classList.add('bg-red-100', 'text-red-800');
-            } else if (type === 'success') {
-                messageBox.classList.add('bg-green-100', 'text-green-800');
-            }
-        }
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const form = document.getElementById('promise-form');
+        const submitButton = document.getElementById('submit-button');
+        const buttonText = document.getElementById('button-text');
+        const spinner = document.querySelector('.spinner');
+        const resultArea = document.getElementById('result-area');
+        const messageBox = document.getElementById('message-box');
 
-        function clearMessage() {
-            messageBox.classList.add('hidden');
-            messageBox.textContent = '';
-        }
+        // IMPORTANT: Replace with your deployed Google Apps Script URL
+        const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyGBjnyeasEzG_teaJx1l-cM525w-rlBYUDbJ-LKfMnw2c-ZGv-yulhe6Hq7yd5hahr/exec'; 
 
-        function setLoading(isLoading) {
+        const headlineEl = document.querySelector('#headline-version p');
+        const salesPageEl = document.querySelector('#sales-page-promise p');
+        const adCopyEl = document.querySelector('#ad-copy-foundation p');
+
+        // --- Helper Functions ---
+        const setLoading = (isLoading) => {
             submitButton.disabled = isLoading;
-            if (isLoading) {
-                submitButton.innerHTML = `
-                    <svg class="animate-spin-fast h-5 w-5 mr-3 inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    Generating Promise...
-                `;
-                submitButton.classList.add('animate-pulse-fast');
-            } else {
-                submitButton.innerHTML = 'Get The Big Result Promise';
-                submitButton.classList.remove('animate-pulse-fast');
-            }
-        }
+            form.classList.toggle('loading', isLoading);
+            spinner.style.display = isLoading ? 'block' : 'none';
+            buttonText.textContent = isLoading ? 'Generating Promise...' : 'Get The Big Result';
+        };
 
-        // Function to parse the AI's numbered output into separate parts
-        function parsePromises(text) {
-            // Use regex to split the string based on the numbered list format "1. ", "2. ", "3. "
-            // The split array will contain: 
-            // [0] = "" (before "1.")
-            // [1] = "Headline Version..."
-            // [2] = "Sales Page Promise..."
-            // [3] = "Ad Copy Foundation..."
-            const parts = text.split(/\d\.\s/g).map(p => p.trim()).filter(p => p.length > 0);
+        const displayMessage = (message, type) => {
+            messageBox.textContent = message;
+            messageBox.className = type;
+            messageBox.style.display = 'block';
+            setTimeout(() => {
+                messageBox.style.display = 'none';
+            }, 5000);
+        };
+
+        const parseResult = (text) => {
+            // Regex to find the three numbered points
+            const regex = /1\.\s*(.+?)\n2\.\s*(.+?)\n3\.\s*(.+)/s;
+            const match = text.match(regex);
             
-            if (parts.length === 3) {
+            if (match) {
+                // Remove numbering and trim whitespace
                 return {
-                    headline: parts[0],
-                    salesPage: parts[1],
-                    adCopy: parts[2]
+                    headline: match[1].trim(),
+                    salesPage: match[2].trim(),
+                    adCopy: match[3].trim()
                 };
             }
-            // If parsing fails, return the raw text for debugging/display
-            return {
-                headline: 'Error: Could not parse output. Raw output:',
-                salesPage: text,
-                adCopy: 'Check the GAS console logs for errors.'
-            };
-        }
+            return null;
+        };
 
-        form.addEventListener('submit', async (event) => {
-            event.preventDefault();
-            clearMessage();
+        // --- Form Submission Handler ---
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
 
-            if (GAS_API_URL.includes("YOUR_GAS_WEB_APP_URL_HERE")) {
-                showMessage("🛑 Configuration Error: Please replace 'YOUR_GAS_WEB_APP_URL_HERE' in the JavaScript code with your actual deployed Google Apps Script URL.", 'error');
+            if (GAS_WEB_APP_URL === 'YOUR_DEPLOYED_GAS_WEB_APP_URL_HERE') {
+                displayMessage('Error: Please replace YOUR_DEPLOYED_GAS_WEB_APP_URL_HERE with your actual deployed Google Apps Script URL.', 'error');
                 return;
             }
 
             setLoading(true);
-            resultsContainer.classList.add('hidden');
+            resultArea.classList.remove('fade-in');
 
-            // Use FormData for simple, CORS-friendly submission to GAS
             const formData = new FormData(form);
+            // FormData is used to bypass CORS when sending data to GAS, which expects application/x-www-form-urlencoded
             
             try {
-                // Fetch call to the GAS Web App URL
-                const response = await fetch(GAS_API_URL, {
+                const response = await fetch(GAS_WEB_APP_URL, {
                     method: 'POST',
-                    body: formData // Sends data as application/x-www-form-urlencoded
+                    body: formData,
+                    // Note: Do not set Content-Type header with FormData; the browser handles it correctly.
                 });
-                
+
                 if (!response.ok) {
-                    // Though GAS typically returns 200, checking the network status is good practice
-                    throw new Error(`Network response was not ok, status: ${response.status}`);
+                    throw new Error(`HTTP error! status: ${response.status}`);
                 }
 
                 const data = await response.json();
-                
-                if (data.success) {
-                    const promises = parsePromises(data.promise);
 
-                    headlineText.textContent = promises.headline;
-                    salesPageText.textContent = promises.salesPage;
-                    adCopyText.textContent = promises.adCopy;
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+
+                const parsed = parseResult(data.content);
+
+                if (parsed) {
+                    headlineEl.textContent = parsed.headline;
+                    salesPageEl.textContent = parsed.salesPage;
+                    adCopyEl.textContent = parsed.adCopy;
                     
-                    resultsContainer.classList.remove('hidden');
-                    showMessage("Promise generated successfully!", 'success');
+                    // Animate results in
+                    setTimeout(() => {
+                        resultArea.classList.add('fade-in');
+                    }, 50);
 
+                    displayMessage('Product Promise generated successfully!', 'success');
                 } else {
-                    // Handle application-level errors from the GAS script
-                    throw new Error(data.error || "An unknown error occurred in the backend.");
+                    throw new Error("API response format was incorrect. Check the AI model's output.");
                 }
 
             } catch (error) {
-                console.error("Fetch Error:", error);
-                showMessage(`Generation Failed: ${error.message || 'Check browser console and Google Apps Script logs.'}`, 'error');
+                console.error('Fetch error:', error);
+                displayMessage(`Generation failed: ${error.message}. Please check the console and your GAS setup.`, 'error');
             } finally {
                 setLoading(false);
             }
         });
-    </script>
+    });
+</script>
+
 </body>
 </html>
