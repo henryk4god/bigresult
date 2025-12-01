@@ -286,13 +286,58 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {
-        // ... (other variable definitions) ...
+        // -----------------------------------------------------------------
+        // 🎯 CRITICAL FIX: VARIABLE DEFINITIONS (These lines were missing or incomplete)
+        // -----------------------------------------------------------------
+        const form = document.getElementById('promise-form');
+        const submitButton = document.getElementById('submit-button');
+        const buttonText = document.getElementById('button-text');
+        const spinner = document.querySelector('.spinner');
+        const resultArea = document.getElementById('result-area');
+        const messageBox = document.getElementById('message-box');
         
+        // Element references for result output
+        const headlineEl = document.querySelector('#headline-version p');
+        const salesPageEl = document.querySelector('#sales-page-promise p');
+        const adCopyEl = document.querySelector('#ad-copy-foundation p');
+        // -----------------------------------------------------------------
+
         // IMPORTANT: Replace with your deployed Google Apps Script URL
-        // Example: 'https://script.google.com/macros/s/AKfycb.../exec'
+        // Your deployed URL is correctly included here:
         const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbz0B_9P2--1714i9hIn4hA_93_D7Z4hsgJXltI9YVX6SRrXCmM43GkCHFLXEKtyH4n4/exec'; 
 
-        // ... (other functions) ...
+        // --- Helper Functions ---
+        const setLoading = (isLoading) => {
+            submitButton.disabled = isLoading;
+            form.classList.toggle('loading', isLoading);
+            spinner.style.display = isLoading ? 'block' : 'none';
+            buttonText.textContent = isLoading ? 'Generating Promise...' : 'Get The Big Result';
+        };
+
+        const displayMessage = (message, type) => {
+            messageBox.textContent = message;
+            messageBox.className = type;
+            messageBox.style.display = 'block';
+            setTimeout(() => {
+                messageBox.style.display = 'none';
+            }, 5000);
+        };
+
+        const parseResult = (text) => {
+            // Regex to find the three numbered points
+            const regex = /1\.\s*(.+?)\n2\.\s*(.+?)\n3\.\s*(.+)/s;
+            const match = text.match(regex);
+            
+            if (match) {
+                // Remove numbering and trim whitespace
+                return {
+                    headline: match[1].trim(),
+                    salesPage: match[2].trim(),
+                    adCopy: match[3].trim()
+                };
+            }
+            return null;
+        };
 
         // --- Form Submission Handler ---
         form.addEventListener('submit', async (e) => {
@@ -306,14 +351,14 @@
             setLoading(true);
             resultArea.classList.remove('fade-in');
 
-            // Using FormData is the key to bypassing CORS with GAS
             const formData = new FormData(form);
+            // FormData is used to bypass CORS when sending data to GAS, which expects application/x-www-form-urlencoded
             
             try {
                 const response = await fetch(GAS_WEB_APP_URL, {
                     method: 'POST',
                     body: formData,
-                    // Note: Do not set Content-Type header with FormData; the browser handles it.
+                    // Note: Do not set Content-Type header with FormData; the browser handles it correctly.
                 });
 
                 if (!response.ok) {
@@ -321,8 +366,7 @@
                 }
 
                 const data = await response.json();
-                
-                // The backend returns a property called 'content' for success
+
                 if (data.error) {
                     throw new Error(data.error);
                 }
